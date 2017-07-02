@@ -13,7 +13,7 @@ class FibonacciTest {
         val f = fib(-5)
 
         // ASSERT
-        assertEquals(10, f)
+        assertEquals(0, f)
     }
 
     @Test
@@ -24,7 +24,7 @@ class FibonacciTest {
         val f = fib(0)
 
         // ASSERT
-        assertEquals(1, f)
+        assertEquals(0, f)
     }
 
     @Test
