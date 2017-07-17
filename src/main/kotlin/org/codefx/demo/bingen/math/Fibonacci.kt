@@ -1,4 +1,4 @@
-package org.codefx.demo.bingen.energy_model.math
+package org.codefx.demo.bingen.math
 
 fun fib(n: Int): Int {
     // return 0 for negative n's

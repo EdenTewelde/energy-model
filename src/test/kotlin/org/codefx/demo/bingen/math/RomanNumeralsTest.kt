@@ -1,4 +1,4 @@
-package org.codefx.demo.bingen.energy_model.math
+package org.codefx.demo.bingen.math
 
 import org.junit.Assert.assertEquals
 import org.junit.Test
