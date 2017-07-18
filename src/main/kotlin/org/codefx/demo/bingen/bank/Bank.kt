@@ -33,6 +33,7 @@ class Bank {
 
         val newAccount = Account()
         customer.accounts.add(newAccount)
+        newAccount.deposit(openingDeposit)
         return newAccount
     }
 
@@ -84,8 +85,10 @@ class Bank {
 
     fun transferBetweenCustomers(from: Customer, to: Customer, amount: Money): Money {
         val fromAccount = from.defaultAccount
-        val toAccount = from.defaultAccount
-        return transferBetweenAccounts(fromAccount, toAccount, amount)
+        val toAccount = to.defaultAccount
+        fromAccount.withdraw(amount)
+        val transferredAmount = toAccount.deposit(amount)
+        return transferredAmount
     }
 
 }
