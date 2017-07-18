@@ -30,10 +30,9 @@ class Bank {
         if (!customers.contains(customer)) {
             println("!! CUSTOMER DOES NOT BELONG TO THIS BANK")
         }
-
-        val newAccount = Account()
+        val newAccount = Account(openingDeposit,limit)
         customer.accounts.add(newAccount)
-        newAccount.deposit(openingDeposit)
+
         return newAccount
     }
 
