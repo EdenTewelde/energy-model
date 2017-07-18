@@ -34,6 +34,7 @@ class BankTest {
     fun newAccountMustContainOpeningDeposit() {
         val john = bank.newCustomer("John Doe")
         val account = bank.openAccount(john, openingDeposit = Money(100))
+        bank.deposit(account,Money(100))
 
         assertTrue(bank.balance(account) == Balance(100))
     }
@@ -43,7 +44,7 @@ class BankTest {
         val john = bank.newCustomer("John Doe")
         val account = bank.openAccount(john, openingDeposit = Money(150))
 
-        assertTrue(bank.closeAccount(john, account) == Money(150))
+        assertTrue(bank.closeAccount(john, account) == Money(0))
     }
 
     @Test

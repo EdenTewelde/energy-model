@@ -72,7 +72,7 @@ class Bank {
     }
 
     fun withdraw(account: Account, amount: Money): Money {
-        return account.deposit(amount)
+        return account.withdraw(amount)
     }
 
     fun transferBetweenAccounts(from: Account, to: Account, amount: Money): Money {
