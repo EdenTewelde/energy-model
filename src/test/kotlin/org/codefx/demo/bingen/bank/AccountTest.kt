@@ -8,7 +8,8 @@ class AccountTest {
     @Test
     fun newAccountHasSpecifiedBalance() {
         // SETUP
-        val account = Account(openingDeposit = Money(100))
+        val bank = Bank()
+        val account = Account(bank,openingDeposit = Money(100))
 
         // EXECUTE
         val balance = account.balance
@@ -20,7 +21,8 @@ class AccountTest {
     @Test
     fun depositIncreasesBalance() {
         // SETUP
-        val account = Account()
+        val bank = Bank()
+        val account = Account(bank)
 
         // EXECUTE
         account.deposit(Money(50))
@@ -32,7 +34,8 @@ class AccountTest {
     @Test
     fun withdrawalDecreasesBalance() {
         // SETUP
-        val account = Account(openingDeposit = Money(100))
+        val bank = Bank()
+        val account = Account(bank,openingDeposit = Money(100))
 
         // EXECUTE
         val received = account.withdraw(Money(60))
@@ -76,7 +79,8 @@ class AccountTest {
     @Test
     fun accountCanBeOverdrawnToLimit() {
         // SETUP
-        val account = Account(openingDeposit = Money(100), limit = Balance(-100))
+        val bank = Bank()
+        val account = Account(bank,openingDeposit = Money(100), limit = Balance(-100))
 
         // EXECUTE
         val received = account.withdraw(Money(150))

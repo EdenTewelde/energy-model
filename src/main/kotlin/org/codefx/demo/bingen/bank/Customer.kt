@@ -1,11 +1,11 @@
 package org.codefx.demo.bingen.bank
 
-class Customer(val name: String, var defaultAccount: Account) {
+class Customer(val name: String, var defaultAccountNumber: AccountNumber) {
 
-    val accounts: MutableList<Account> = mutableListOf()
+    val accounts: MutableList<AccountNumber> = mutableListOf()
 
     init {
-        accounts.add(defaultAccount)
+        accounts.add(defaultAccountNumber)
     }
 
 }

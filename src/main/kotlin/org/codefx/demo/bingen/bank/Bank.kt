@@ -1,5 +1,7 @@
 package org.codefx.demo.bingen.bank
 
+import java.util.*
+
 class Bank {
 
     /*
@@ -25,69 +27,148 @@ class Bank {
      */
 
     val customers: MutableList<Customer> = mutableListOf()
+    val allAccounts : MutableMap<AccountNumber,Account> = mutableMapOf()
+    var newAccountNumber : AccountNumber = AccountNumber(0)
+    val report : MutableList<String> = mutableListOf()
 
-    fun openAccount(customer: Customer, openingDeposit: Money = Money(0), limit: Balance = Balance(0)): Account {
+    fun getAccountNumber() : AccountNumber {
+        newAccountNumber = newAccountNumber.next()
+        return newAccountNumber
+    }
+
+    fun openAccount(customer: Customer, openingDeposit: Money = Money(0), limit: Balance = Balance(0)): AccountNumber {
         if (!customers.contains(customer)) {
             println("!! CUSTOMER DOES NOT BELONG TO THIS BANK")
         }
-        val newAccount = Account(openingDeposit,limit)
-        customer.accounts.add(newAccount)
-
-        return newAccount
+        val newAccount = Account(this,openingDeposit,limit)
+        val newAccountNumber = this.getAccountNumber()
+        customer.accounts.add(newAccountNumber)
+        allAccounts.put(newAccountNumber,newAccount)
+        addReport("Open account for " + customer.name + "(#" + newAccountNumber.accountNumber +")" )
+        return newAccountNumber
     }
 
-    fun closeAccount(customer: Customer, account: Account): Money {
+    fun closeAccount(customer: Customer, accountNumber: AccountNumber): Money {
+        val account : Account? = allAccounts[accountNumber]
+        if (account == null) {
+            println("!! ACCOUNT NUMBER DOES NOT EXIST IN THIS BANK")
+            return Money(0)
+        }
+
         if (!customers.contains(customer)) {
             println("!! CUSTOMER DOES NOT BELONG TO THIS BANK")
             return Money(0)
         }
-
         if (account.balance.isOverdrawn()) {
             println("!! OVERDRAWN ACCOUNT CAN NOT BE CLOSED")
             return Money(0)
         }
 
-        customer.accounts.remove(account)
+        customer.accounts.remove(accountNumber)
+        allAccounts.remove(accountNumber)
 
         if (customer.accounts.isEmpty()) {
             customers.remove(customer)
+            allAccounts.remove(accountNumber)
         }
-
+        addReport("Close account #" + accountNumber.accountNumber)
         return account.withdrawRemaining()
+
     }
 
     fun newCustomer(name: String): Customer {
-        val newAccount = Account()
-        val newCustomer = Customer(name, newAccount)
+        val newAccount = Account(this)
+        val newAccountNumber = this.getAccountNumber()
+        val newCustomer = Customer(name, newAccountNumber)
         customers.add(newCustomer)
+        allAccounts.put(newAccountNumber,newAccount)
+        addReport("New Customer: " + newCustomer.name)
         return newCustomer
     }
 
-    fun balance(account: Account): Balance {
+    fun balance(accountNumber: AccountNumber): Balance {
+        val account = allAccounts[accountNumber]
+        if (account == null) {
+            println("!! ACCOUNT NUMBER DOES NOT BELONG TO THIS BANK")
+            return Balance(0)
+        }
         return account.balance
     }
 
-    fun deposit(account: Account, amount: Money): Money {
+    fun deposit(accountNumber: AccountNumber, amount: Money): Money {
+        val account = allAccounts[accountNumber]
+        if (account == null) {
+            println("!! ACCOUNT NUMBER DOES NOT BELONG TO THIS BANK")
+            return Money(0)
+        }
+        addReport("Deposit " + amount.centAmount/100.0 + " " + amount.currency + " to account #"
+                + accountNumber.accountNumber)
         return account.deposit(amount)
     }
 
-    fun withdraw(account: Account, amount: Money): Money {
-        return account.withdraw(amount)
-    }
-
-    fun transferBetweenAccounts(from: Account, to: Account, amount: Money): Money {
-        val withdrawnAmount = from.withdraw(amount)
-        to.deposit(withdrawnAmount)
-        // TODO: reporting
+    fun withdraw(accountNumber: AccountNumber, amount: Money): Money {
+        val account = allAccounts[accountNumber]
+        if (account == null) {
+            println("!! ACCOUNT NUMBER DOES NOT BELONG TO THIS BANK")
+            return Money(0)
+        }
+        val withdrawnAmount = account.withdraw(amount)
+        if (withdrawnAmount.centAmount > 0) {
+            addReport("Withdraw " + amount.centAmount / 100.0 + " " + amount.currency + " from account #"
+                    + accountNumber.accountNumber)
+        }
         return withdrawnAmount
     }
 
-    fun transferBetweenCustomers(from: Customer, to: Customer, amount: Money): Money {
-        val fromAccount = from.defaultAccount
-        val toAccount = to.defaultAccount
-        fromAccount.withdraw(amount)
-        val transferredAmount = toAccount.deposit(amount)
+    fun transferBetweenAccounts(from: AccountNumber, to: AccountNumber, amount: Money): Money {
+        val fromAccount = allAccounts[from]
+        if (fromAccount == null) {
+            println("!! ACCOUNT NUMBER (SENDER) DOES NOT BELONG TO THIS BANK")
+            return Money(0)
+        }
+        val toAccount = allAccounts[to]
+        if (toAccount == null) {
+            println("!! ACCOUNT NUMBER (RECEIVER) DOES NOT BELONG TO THIS BANK")
+            return Money(0)
+        }
+        val transferredAmount = fromAccount.withdraw(amount)
+        toAccount.deposit(transferredAmount)
+        if (transferredAmount.centAmount > 0) {
+            addReport("Transfer " + amount.centAmount / 100.0 + " " + amount.currency + " from account #"
+                    + from.accountNumber + " to account #" + to.accountNumber)
+        }
         return transferredAmount
     }
 
+    fun transferBetweenCustomers(from: Customer, to: Customer, amount: Money): Money {
+        val fromAccountNumber = from.defaultAccountNumber
+        val toAccountNumber = to.defaultAccountNumber
+        val fromAccount = allAccounts[fromAccountNumber]
+        if (fromAccount == null) {
+            println("!! ACCOUNT NUMBER (SENDER) DOES NOT BELONG TO THIS BANK")
+            return Money(0)
+        }
+        val toAccount = allAccounts[toAccountNumber]
+        if (toAccount == null) {
+            println("!! ACCOUNT NUMBER (RECEIVER) DOES NOT BELONG TO THIS BANK")
+            return Money(0)
+        }
+        val transferredAmount = fromAccount.withdraw(amount)
+        toAccount.deposit(transferredAmount)
+        if (transferredAmount.centAmount > 0) {
+            addReport("Transfer " + amount.centAmount / 100.0 + " " + amount.currency + " from: " + from.name + " to: "
+                    + to.name)
+        }
+        return transferredAmount
+    }
+
+    fun addReport(action : String){
+        this.report.add(action)
+    }
+
+    fun getBankReports() {
+        for (item in this.report) {
+            println(item)
+        }
+    }
 }

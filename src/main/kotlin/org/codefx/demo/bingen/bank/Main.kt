@@ -8,18 +8,17 @@ package org.codefx.demo.bingen.bank
 fun main(args : Array<String>) {
 
     val bestbank : Bank = Bank()
-    val eden = bestbank.newCustomer("Eden")
-    val john = bestbank.newCustomer("John")
-    val account = bestbank.openAccount(eden,Money(50),Balance(-100))
-    val account2 = bestbank.openAccount(eden,Money(500),Balance(0))
-    account.deposit(Money(100))
-    account.withdraw(Money(300))
-    val accj = bestbank.openAccount(john,Money(100),limit = Balance(-100))
-    println(bestbank.withdraw(accj,Money(150)))
-    println(bestbank.transferBetweenAccounts(account2,account,Money(100)))
-    println(bestbank.transferBetweenCustomers(eden,john,Money(30)))
-    println(bestbank.closeAccount(eden,account2))
-
-
+    val john = bestbank.newCustomer("John Doe")
+    val jane = bestbank.newCustomer("Jane Strange")
+    val johnAccount1 = bestbank.openAccount(john,Money(500))
+    val johnAccount2 = bestbank.openAccount(john,Money(1000))
+    val janeAccount1 = bestbank.openAccount(jane,Money(20000))
+    bestbank.deposit(john.defaultAccountNumber,Money(10000))
+    bestbank.withdraw(janeAccount1,Money(5000))
+    bestbank.deposit(jane.defaultAccountNumber,Money(12340))
+    bestbank.transferBetweenCustomers(jane,john,Money(5000))
+    bestbank.transferBetweenAccounts(johnAccount2,janeAccount1,Money(10000))
+    bestbank.closeAccount(john,johnAccount1)
+    bestbank.getBankReports()
 
 }

@@ -1,5 +1,6 @@
 package org.codefx.demo.bingen.bank
 
+
 /**
  * An account is an entity (i.e. regular class), which has both a balance and a limit.
  *
@@ -8,7 +9,7 @@ package org.codefx.demo.bingen.bank
  * To keep them around, we declare two fields [balance] and [limit] that we assign
  * during construction.
  */
-class Account(openingDeposit: Money = Money(0), limit: Balance = Balance(0)) {
+class Account(bank: Bank, openingDeposit: Money = Money(0), limit: Balance = Balance(0)) {
 
     var balance = Balance(openingDeposit)
     var limit = limit
@@ -40,5 +41,12 @@ class Account(openingDeposit: Money = Money(0), limit: Balance = Balance(0)) {
         val remainingAmount = Money(balance)
         return withdraw(remainingAmount)
     }
+}
 
+data class AccountNumber(var accountNumber: Int) {
+
+    fun next() : AccountNumber {
+        val new = this.accountNumber + 1
+        return AccountNumber(new)
+    }
 }
